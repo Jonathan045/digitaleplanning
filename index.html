@@ -14,5 +14,92 @@
     <!-- Knop om het formulier voor het toevoegen van een klant te openen -->
     <div class="add-customer-btn" id="add-customer-btn">+</div>
 
+    <!-- Formulier om een nieuwe klant toe te voegen; standaard verborgen -->
+    <div class="customer-form" id="customer-form" style="display: none">
+      <!-- Knop om het klantformulier te sluiten -->
+      <span class="close-form" id="close-form">&times;</span>
+      <h2>Klant toevoegen</h2>
+
+      <!-- Input veld voor de naam van de klant -->
+      <label for="customer-name">Naam:</label>
+      <input type="text" id="customer-name" placeholder="Naam van klant" />
+
+      <!-- Input veld voor de orderomschrijving of ID -->
+      <label for="customer-id">Omschrijving:</label>
+      <input type="text" id="customer-id" placeholder="Ordernummer" />
+
+      <!-- Datumveld voor de einddatum van de opdracht -->
+      <label for="customer-enddate">Einddatum:</label>
+      <input type="date" id="customer-enddate" />
+
+      <!-- Meerdere selectiemogelijkheden voor type werk -->
+      <label>Type werk:</label>
+      <div class="multiselect" id="jobtype-multiselect">
+        <div class="selectBox" onclick="toggleCheckboxList('jobtype-options')">
+          <span class="selected-text" id="jobtype-selected-text"
+            >Selecteer type werk</span
+          >
+          <div class="arrow">&#9660;</div>
+        </div>
+        <div class="checkbox-list" id="jobtype-options" style="display: none">
+          <!-- Checkbox opties voor verschillende type werk -->
+          <label><input type="checkbox" value="Buigen" /> Buigen</label>
+          <label><input type="checkbox" value="Lijmen" /> Lijmen</label>
+          <label><input type="checkbox" value="Freezen" /> Freezen</label>
+          <label><input type="checkbox" value="Laseren" /> Laseren</label>
+          <label><input type="checkbox" value="Zagen" /> Zagen</label>
+          <label><input type="checkbox" value="Graveren" /> Graveren</label>
+        </div>
+      </div>
+
+      <!-- Meerdere selectiemogelijkheden voor werknemers -->
+      <label>Werknemer:</label>
+      <div class="multiselect" id="employee-multiselect">
+        <div class="selectBox" onclick="toggleCheckboxList('employee-options')">
+          <span class="selected-text" id="employee-selected-text"
+            >Selecteer werknemer</span
+          >
+          <div class="arrow">&#9660;</div>
+        </div>
+        <div class="checkbox-list" id="employee-options" style="display: none">
+          <!-- Checkbox opties voor verschillende werknemers -->
+          <label><input type="checkbox" value="MB" /> MB</label>
+          <label><input type="checkbox" value="DB" /> DB</label>
+          <label><input type="checkbox" value="RA" /> RA</label>
+          <label><input type="checkbox" value="MH" /> MH</label>
+        </div>
+      </div>
+
+      <!-- Radiobuttons om prioriteit van de klant aan te geven -->
+      <label>Hoge prioriteit:</label>
+      <div class="priority-radio">
+        <label for="priority-yes-radio">
+          <input
+            type="radio"
+            name="customer-priority"
+            value="ja"
+            id="priority-yes-radio"
+          />
+          Ja
+        </label>
+        <label for="priority-no-radio">
+          <input
+            type="radio"
+            name="customer-priority"
+            value="nee"
+            id="priority-no-radio"
+            checked
+          />
+          Nee
+        </label>
+      </div>
+
+      <!-- Uploadveld voor het toevoegen van een PDF-bestand -->
+      <label for="customer-pdf">PDF-bestand:</label>
+      <input type="file" id="customer-pdf" accept=".pdf" />
+
+      <!-- Knop om de ingevulde klantgegevens op te slaan -->
+      <button id="save-customer">Opslaan</button>
+    </div>
 </body>
 </html>
