@@ -12,3 +12,26 @@ body {
     width: 200px;
     height: auto;
 }
+
+#add-customer-btn {
+  position: fixed;
+  top: 32px;
+  right: 32px;
+  z-index: 1000;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 32px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-customer-btn:hover {
+  background-color: #45a049;
+}
