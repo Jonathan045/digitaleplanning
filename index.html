@@ -101,7 +101,7 @@
       <!-- Knop om de ingevulde klantgegevens op te slaan -->
       <button id="save-customer">Opslaan</button>
     </div>
-    
+
     <!-- Container voor overzicht of samenvatting van klanten -->
     <div id="summary-container"></div>
 
@@ -134,5 +134,53 @@
         <button id="search-employee-button">Zoeken</button>
       </div>
     </div>
+    <!-- Container voor dynamische datumgerelateerde inhoud (bv. kalenderweergave) -->
+    <div id="date-container" style="margin-top: 20px"></div>
+
+    <!-- Modal voor het tonen van acties zoals bewerken of verwijderen -->
+    <div id="actions-modal" class="modal">
+      <div class="modal-content">
+        <p id="actions-message">Welke actie wil je uitvoeren?</p>
+        <button id="action-edit" class="modal-action-btn">Bewerken</button>
+        <button id="action-delete" class="modal-action-btn">Verwijderen</button>
+        <button id="cancel-actions" class="modal-action-btn">Annuleren</button>
+      </div>
+    </div>
+
+    <!-- Modal voor bevestiging bij verwijderen van een klant -->
+    <div id="delete-modal" class="modal" style="display: none">
+      <div class="modal-content">
+        <p id="delete-message"></p>
+        <button
+          id="confirm-delete"
+          class="modal-action-btn"
+          style="background: #f44336; color: #fff"
+        >
+          Verwijderen
+        </button>
+        <button id="cancel-delete" class="modal-action-btn">Annuleren</button>
+      </div>
+    </div>
+
+    <!-- Notificatiecontainer om tijdelijke meldingen aan de gebruiker te tonen -->
+    <div
+      id="notification-container"
+      style="
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2000;
+        display: none;
+        padding: 10px 20px;
+        color: white;
+        border-radius: 5px;
+        font-size: 16px;
+        text-align: center;
+      "
+    ></div>
+
+    <!-- JavaScript-bestand voor functionaliteit van de applicatie -->
+    <script src="script.js"></script>
 </body>
 </html>
