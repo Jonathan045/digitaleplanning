@@ -266,3 +266,262 @@ body {
   padding: 8px 10px;
   font-size: 13px;
 }
+/* Zoekbalk compacter en 2 kolommen layout, box altijd breed genoeg */
+#search-container {
+  max-width: 900px;
+  width: 100%;
+  font-size: 13px;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  align-items: center;
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  margin-top: 18px;
+  min-width: 320px;
+}
+
+#search-container > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+#search-container label {
+  font-size: 12px;
+  color: #444;
+  margin-right: 2px;
+  white-space: nowrap;
+}
+
+#search-container input,
+#search-container select {
+  height: 28px;
+  font-size: 13px;
+  margin: 0;
+  padding: 0 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  min-width: 80px;
+  max-width: 200px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#search-container {
+  max-width: 600px;
+  width: 100%;
+  font-size: 13px;
+  padding: 4px 8px; /* nog compacter */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 6px; /* nog minder ruimte tussen de kolommen */
+  align-items: center;
+  position: fixed;
+  top: 20px; /* hoger */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  margin-top: 0;
+  min-width: 260px;
+}
+
+#search-container button {
+  padding: 0 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+  height: 22px;
+  grid-column: 1 / span 2;
+  width: auto;
+  min-width: 70px;
+  max-width: 120px;
+  justify-self: end;
+}
+
+#search-container button:hover {
+  background-color: #388e3c;
+}
+
+@media (max-width: 900px) {
+  #search-container {
+    max-width: 98vw;
+    padding: 8px 4px;
+  }
+  #search-container input,
+  #search-container select {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  #search-container {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 8px 4px;
+    max-width: 98vw;
+  }
+  #search-container > div {
+    width: 100%;
+    gap: 4px;
+  }
+  #search-container input,
+  #search-container select {
+    width: 100%;
+    min-width: 0;
+  }
+  #search-container button {
+    grid-column: 1;
+  }
+}
+
+.customer-form input:focus,
+.customer-form select:focus {
+  border-color: #4caf50;
+  outline: none;
+}
+
+.customer-form button {
+  padding: 12px 15px;
+  margin-top: 15px;
+  width: 100%;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.customer-form button:hover {
+  background-color: #45a049;
+}
+
+#cancel-customer {
+  background-color: #f44336;
+  margin-top: 10px;
+}
+
+#cancel-customer:hover {
+  background-color: #e53935;
+}
+
+.close-form {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.close-form:hover {
+  color: #f44336;
+}
+
+/* --- Zorg dat de multiselects in het formulier altijd exact even breed zijn als de andere velden --- */
+#jobtype-multiselect .selectBox,
+#employee-multiselect .selectBox {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- Verberg dubbele oude multiselect styles buiten het formulier --- */
+.multiselect,
+.selectBox,
+.checkbox-list {
+  all: unset;
+}
+
+/* --- Herstel multiselects in de klantentabel buiten het formulier indien nodig --- */
+.customer-table .multiselect,
+.customer-table .selectBox,
+.customer-table .checkbox-list {
+  all: unset;
+}
+
+/* --- Checkbox links in de klantentabel --- */
+.customer-table td:first-child {
+  width: 40px;
+  text-align: left;
+  padding-left: 10px !important;
+}
+.customer-checkbox {
+  margin-left: 0 !important;
+  margin-right: 0.5em;
+  accent-color: #0078d4;
+  width: 18px;
+  height: 18px;
+}
+
+/* --- Modals, search, highlight, etc. (laat deze zoals ze waren) --- */
+#summary-container {
+  margin-top: 120px;
+  margin-bottom: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+#summary-container h2 {
+  margin-top: 0;
+}
+
+#customer-summary {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.summary-item,
+.debug-message {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  font-size: 14px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.summary-item {
+  background-color: #e7f5e7;
+  border: 1px solid #4caf50;
+  color: #333;
+}
+
+.debug-message {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.summary-item.show,
+.debug-message.show {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -101,5 +101,38 @@
       <!-- Knop om de ingevulde klantgegevens op te slaan -->
       <button id="save-customer">Opslaan</button>
     </div>
+    
+    <!-- Container voor overzicht of samenvatting van klanten -->
+    <div id="summary-container"></div>
+
+    <!-- Zoeksectie om klanten te filteren op verschillende criteria -->
+    <div id="search-container">
+      <div>
+        <label for="search-date">Zoek op datum:</label>
+        <input type="date" id="search-date" />
+        <button id="search-button">Zoeken</button>
+      </div>
+      <div>
+        <label for="search-name">Zoek op naam:</label>
+        <input type="text" id="search-name" placeholder="Naam van klant" />
+        <button id="search-name-button">Zoeken</button>
+      </div>
+      <div>
+        <label for="search-week">Zoek op week:</label>
+        <input
+          type="number"
+          id="search-week"
+          min="1"
+          max="53"
+          placeholder="Weeknummer"
+        />
+        <button id="search-week-button">Zoeken</button>
+      </div>
+      <div>
+        <label for="search-employee">Zoek op werknemer:</label>
+        <input type="text" id="search-employee" placeholder="Werknemer" />
+        <button id="search-employee-button">Zoeken</button>
+      </div>
+    </div>
 </body>
 </html>
