@@ -304,3 +304,134 @@ window.onload = function () {
     dateContainer.appendChild(dateBox);
     dateContainer.appendChild(customerDetails);
   });
+
+  // Zoek op datum
+  searchButton &&
+    (searchButton.onclick = function () {
+      const searchDate = searchDateInput.value;
+      if (!searchDate) {
+        alert("Voer een geldige datum in.");
+        return;
+      }
+
+      const dateBox = document.querySelector(`[data-date="${searchDate}"]`);
+      if (dateBox) {
+        dateBox.scrollIntoView({ behavior: "smooth", block: "center" });
+        dateBox.classList.add("highlight");
+        setTimeout(() => dateBox.classList.remove("highlight"), 2000);
+      } else {
+        alert("Geen gegevens gevonden voor de opgegeven datum.");
+      }
+    });
+
+  // Zoek op naam
+  searchNameButton &&
+    (searchNameButton.onclick = function () {
+      const searchName = searchNameInput.value.trim().toLowerCase();
+      if (!searchName) {
+        alert("Voer een geldige naam in.");
+        return;
+      }
+
+      let found = false;
+
+      for (const dateStr in savedCustomers) {
+        if (!isDayRelevant(dateStr)) continue;
+        const customers = savedCustomers[dateStr];
+        const tbody = document.getElementById(`table-body-${dateStr}`);
+        const dateBox = document.querySelector(`[data-date="${dateStr}"]`);
+        const customerDetails = document.getElementById(`details-${dateStr}`);
+
+        if (customers) {
+          customers.forEach((customer, index) => {
+            if (customer.name.toLowerCase().includes(searchName)) {
+              if (customerDetails && dateBox) {
+                customerDetails.classList.add("show");
+                dateBox.scrollIntoView({ behavior: "smooth", block: "center" });
+              }
+
+              const row = tbody.children[index];
+              row.classList.add("highlight");
+              setTimeout(() => row.classList.remove("highlight"), 2000);
+
+              found = true;
+            }
+          });
+        }
+      }
+
+      if (!found) {
+        alert("Geen klant gevonden met de opgegeven naam.");
+      }
+    });
+
+  // Zoek op weeknummer (vanaf vandaag, exacte match)
+  searchWeekButton &&
+    (searchWeekButton.onclick = function () {
+      const weekNr = parseInt(searchWeekInput.value, 10);
+      if (!weekNr) {
+        alert("Voer een geldig weeknummer in.");
+        return;
+      }
+      let found = false;
+      const today = new Date();
+      let closestBox = null;
+      let closestDate = null;
+
+      document.querySelectorAll(".date-box").forEach((box) => {
+        const weekSpan = box.querySelector(".weeknr");
+        const dateStr = box.getAttribute("data-date");
+        if (weekSpan && weekSpan.textContent.trim() === `Week ${weekNr}`) {
+          const boxDate = new Date(dateStr);
+          if (boxDate >= today && (!closestDate || boxDate < closestDate)) {
+            closestBox = box;
+            closestDate = boxDate;
+          }
+        }
+      });
+
+      if (closestBox) {
+        closestBox.scrollIntoView({ behavior: "smooth", block: "center" });
+        closestBox.classList.add("highlight");
+        setTimeout(() => closestBox.classList.remove("highlight"), 2000);
+        found = true;
+      }
+
+      if (!found) alert("Geen dagen gevonden voor deze week (vanaf vandaag).");
+    });
+
+  // Zoek op werknemer
+  searchEmployeeButton &&
+    (searchEmployeeButton.onclick = function () {
+      const searchEmp = searchEmployeeInput.value.trim().toLowerCase();
+      if (!searchEmp) {
+        alert("Voer een werknemer in.");
+        return;
+      }
+      let found = false;
+      for (const dateStr in savedCustomers) {
+        if (!isDayRelevant(dateStr)) continue;
+        const customers = savedCustomers[dateStr];
+        const tbody = document.getElementById(`table-body-${dateStr}`);
+        const dateBox = document.querySelector(`[data-date="${dateStr}"]`);
+        const customerDetails = document.getElementById(`details-${dateStr}`);
+        if (customers) {
+          customers.forEach((customer, index) => {
+            const employees = customer.employees || [customer.employee];
+            if (
+              employees.some((emp) => emp.toLowerCase().includes(searchEmp))
+            ) {
+              if (customerDetails && dateBox) {
+                customerDetails.classList.add("show");
+                dateBox.scrollIntoView({ behavior: "smooth", block: "center" });
+              }
+              const row = tbody.children[index];
+              row.classList.add("highlight");
+              setTimeout(() => row.classList.remove("highlight"), 2000);
+              found = true;
+            }
+          });
+        }
+      }
+      if (!found) alert("Geen klant gevonden met deze werknemer.");
+    });
