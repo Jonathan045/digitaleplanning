@@ -1,16 +1,16 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f7fc;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f7fc;
 }
-  
+
 .logo {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 200px;
-    height: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: auto;
 }
 
 #add-customer-btn {
@@ -266,6 +266,7 @@ body {
   padding: 8px 10px;
   font-size: 13px;
 }
+
 /* Zoekbalk compacter en 2 kolommen layout, box altijd breed genoeg */
 #search-container {
   max-width: 900px;
@@ -503,9 +504,7 @@ body {
   font-size: 14px;
   opacity: 0;
   transform: translateY(-10px);
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .summary-item {
@@ -622,9 +621,7 @@ tr:not([style*="background-color"]) {
   cursor: pointer;
   font-size: 14px;
   font-weight: bold;
-  transition:
-    background-color 0.3s ease,
-    transform 0.2s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .actions-btn:hover {
@@ -703,9 +700,7 @@ tr.checked-row td {
   align-items: center;
   padding: 4px 10px;
   border-radius: 6px;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 .priority-radio input[type="radio"] {
   accent-color: #e53935; /* Mooie rode kleur voor ja/nee */
