@@ -435,3 +435,249 @@ window.onload = function () {
       }
       if (!found) alert("Geen klant gevonden met deze werknemer.");
     });
+    
+  // Edit-mode variabelen
+  let editMode = false;
+  let editOldDateStr = null;
+  let editOldCustomer = null;
+
+  addCustomerBtn &&
+    (addCustomerBtn.onclick = function () {
+      resetCustomerForm();
+      editMode = false;
+      editOldDateStr = null;
+      editOldCustomer = null;
+      customerForm.style.display = "block";
+    });
+
+  closeFormBtn &&
+    (closeFormBtn.onclick = function () {
+      customerForm.style.display = "none";
+    });
+
+  saveCustomerBtn &&
+    (saveCustomerBtn.onclick = function () {
+      const name = document.getElementById("customer-name").value.trim();
+      const id = document.getElementById("customer-id").value.trim();
+      const endDate = document.getElementById("customer-enddate").value.trim();
+
+      // Gebruik multiselect helpers
+      const jobTypes = getSelectedJobTypes();
+      const employees = getSelectedEmployees();
+
+      const pdfInput = document.getElementById("customer-pdf");
+      // Prioriteit ophalen uit radio buttons
+      const isHighPriority =
+        document.getElementById("priority-yes-radio").checked;
+
+      if (!endDate) {
+        alert("Selecteer een datum in het formulier!");
+        return;
+      }
+
+      const dateStr = new Date(
+        new Date(endDate).getTime() -
+          new Date(endDate).getTimezoneOffset() * 60000,
+      )
+        .toISOString()
+        .split("T")[0];
+
+      if (name && id && jobTypes.length > 0 && employees.length > 0) {
+        const tbody = document.getElementById(`table-body-${dateStr}`);
+        if (!tbody) {
+          alert("Er is een probleem met de geselecteerde datum.");
+          return;
+        }
+
+        // Bouw klantobject voor melding
+        const klantObj = {
+          name,
+          id,
+          jobTypes,
+          employees,
+          pdfName: pdfInput.files[0]?.name || "",
+          isHighPriority,
+        };
+
+        if (editMode && editOldCustomer) {
+          // Verwijder oude klant uit oude datum
+          if (savedCustomers[editOldDateStr]) {
+            savedCustomers[editOldDateStr] = savedCustomers[
+              editOldDateStr
+            ].filter(
+              (c) =>
+                !(
+                  c.name === editOldCustomer.name &&
+                  c.id === editOldCustomer.id &&
+                  JSON.stringify(c.jobTypes || [c.jobType]) ===
+                    JSON.stringify(
+                      editOldCustomer.jobTypes || [editOldCustomer.jobType],
+                    ) &&
+                  JSON.stringify(c.employees || [c.employee]) ===
+                    JSON.stringify(
+                      editOldCustomer.employees || [editOldCustomer.employee],
+                    )
+                ),
+            );
+            // Verwijder rij uit oude tbody als datum is gewijzigd
+            if (editOldDateStr !== dateStr) {
+              const oldTbody = document.getElementById(
+                `table-body-${editOldDateStr}`,
+              );
+              if (oldTbody) {
+                for (let i = 0; i < oldTbody.children.length; i++) {
+                  const row = oldTbody.children[i];
+                  if (
+                    row.children[1].textContent === editOldCustomer.name &&
+                    row.children[2].textContent === editOldCustomer.id &&
+                    row.children[3].textContent ===
+                      (editOldCustomer.jobTypes
+                        ? editOldCustomer.jobTypes.join(", ")
+                        : editOldCustomer.jobType) &&
+                    row.children[4].textContent ===
+                      (editOldCustomer.employees
+                        ? editOldCustomer.employees.join(", ")
+                        : editOldCustomer.employee)
+                  ) {
+                    oldTbody.removeChild(row);
+                    break;
+                  }
+                }
+              }
+            }
+            // Verwijder dag als leeg
+            if (savedCustomers[editOldDateStr].length === 0) {
+              delete savedCustomers[editOldDateStr];
+              localStorage.setItem(
+                "savedCustomers",
+                JSON.stringify(savedCustomers),
+              );
+            }
+            if (
+              checkedCustomers[editOldDateStr] &&
+              checkedCustomers[editOldDateStr].length === 0
+            ) {
+              delete checkedCustomers[editOldDateStr];
+              localStorage.setItem(
+                "checkedCustomers",
+                JSON.stringify(checkedCustomers),
+              );
+            }
+          }
+          // Voeg nieuwe klant toe
+          if (!savedCustomers[dateStr]) savedCustomers[dateStr] = [];
+          savedCustomers[dateStr].push(klantObj);
+          localStorage.setItem(
+            "savedCustomers",
+            JSON.stringify(savedCustomers),
+          );
+
+          // Zet checkedCustomers entry over als klant bewerkt wordt en datum wijzigt
+          if (editOldDateStr !== dateStr && checkedCustomers[editOldDateStr]) {
+            checkedCustomers[dateStr] = checkedCustomers[dateStr] || [];
+            checkedCustomers[editOldDateStr].forEach((chk) => {
+              if (
+                chk.name === editOldCustomer.name &&
+                chk.id === editOldCustomer.id &&
+                JSON.stringify(chk.jobTypes || [chk.jobType]) ===
+                  JSON.stringify(
+                    editOldCustomer.jobTypes || [editOldCustomer.jobType],
+                  ) &&
+                JSON.stringify(chk.employees || [chk.employee]) ===
+                  JSON.stringify(
+                    editOldCustomer.employees || [editOldCustomer.employee],
+                  )
+              ) {
+                checkedCustomers[dateStr].push(klantObj);
+              }
+            });
+            checkedCustomers[editOldDateStr] = checkedCustomers[
+              editOldDateStr
+            ].filter(
+              (chk) =>
+                !(
+                  chk.name === editOldCustomer.name &&
+                  chk.id === editOldCustomer.id &&
+                  JSON.stringify(chk.jobTypes || [chk.jobType]) ===
+                    JSON.stringify(
+                      editOldCustomer.jobTypes || [editOldCustomer.jobType],
+                    ) &&
+                  JSON.stringify(chk.employees || [chk.employee]) ===
+                    JSON.stringify(
+                      editOldCustomer.employees || [editOldCustomer.employee],
+                    )
+                ),
+            );
+            // Verwijder dag als leeg
+            if (checkedCustomers[editOldDateStr].length === 0) {
+              delete checkedCustomers[editOldDateStr];
+              localStorage.setItem(
+                "checkedCustomers",
+                JSON.stringify(checkedCustomers),
+              );
+            }
+            localStorage.setItem(
+              "checkedCustomers",
+              JSON.stringify(checkedCustomers),
+            );
+          }
+
+          const row = createCustomerRow(
+            name,
+            id,
+            jobTypes,
+            employees,
+            pdfInput,
+            dateStr,
+            tbody,
+            isHighPriority,
+            dateStr,
+          );
+          tbody.appendChild(row);
+          row.classList.add("highlight");
+          setTimeout(() => row.classList.remove("highlight"), 2000);
+
+          showNotification(
+            `Klant bewerkt:<br>${klantInfoString(klantObj, dateStr)}`,
+            "success",
+          );
+        } else {
+          // Toevoegen
+          const row = createCustomerRow(
+            name,
+            id,
+            jobTypes,
+            employees,
+            pdfInput,
+            dateStr,
+            tbody,
+            isHighPriority,
+            dateStr,
+          );
+          tbody.appendChild(row);
+
+          row.classList.add("highlight");
+          setTimeout(() => row.classList.remove("highlight"), 2000);
+
+          if (!savedCustomers[dateStr]) savedCustomers[dateStr] = [];
+          savedCustomers[dateStr].push(klantObj);
+          localStorage.setItem(
+            "savedCustomers",
+            JSON.stringify(savedCustomers),
+          );
+
+          showNotification(
+            `Klant toegevoegd:<br>${klantInfoString(klantObj, dateStr)}`,
+            "success",
+          );
+        }
+
+        customerForm.style.display = "none";
+        resetCustomerForm();
+        editMode = false;
+        editOldDateStr = null;
+        editOldCustomer = null;
+      } else {
+        alert("Vul alle velden in!");
+      }
+    });
