@@ -435,7 +435,7 @@ window.onload = function () {
       }
       if (!found) alert("Geen klant gevonden met deze werknemer.");
     });
-    
+
   // Edit-mode variabelen
   let editMode = false;
   let editOldDateStr = null;
@@ -803,3 +803,171 @@ window.onload = function () {
       }
     });
   }
+  
+    // Bij laden: zet checkbox en groen als nodig
+    if (
+      checkedCustomers[dateStr] &&
+      checkedCustomers[dateStr].some(
+        (c) =>
+          c.name === name &&
+          c.id === id &&
+          JSON.stringify(c.jobTypes) === JSON.stringify(jobTypes) &&
+          JSON.stringify(c.employees) === JSON.stringify(employees),
+      )
+    ) {
+      checkbox.checked = true;
+      row.classList.add("checked-row");
+    }
+
+    return row;
+
+  actionEdit &&
+    (actionEdit.onclick = function () {
+      if (selectedRow) {
+        const cells = selectedRow.children;
+        document.getElementById("customer-name").value = cells[1].textContent;
+        document.getElementById("customer-id").value = cells[2].textContent;
+        document.getElementById("customer-enddate").value = selectedDateStr;
+
+        // Multiselects
+        const jobTypes = cells[3].textContent
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        const employees = cells[4].textContent
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        setMultiselectValues(jobTypes, employees);
+
+        // Prioriteit radio buttons instellen
+        if (selectedRow.classList.contains("high-priority")) {
+          document.getElementById("priority-yes-radio").checked = true;
+          document.getElementById("priority-no-radio").checked = false;
+        } else {
+          document.getElementById("priority-yes-radio").checked = false;
+          document.getElementById("priority-no-radio").checked = true;
+        }
+
+        // Zet editMode en onthoud oude klantinfo
+        editMode = true;
+        editOldDateStr = selectedDateStr;
+        editOldCustomer = {
+          name: cells[1].textContent,
+          id: cells[2].textContent,
+          jobTypes,
+          employees,
+        };
+
+        customerForm.style.display = "block";
+        selectedRow.remove();
+      }
+      actionsModal.style.display = "none";
+    });
+
+  actionDelete &&
+    (actionDelete.onclick = function () {
+      if (selectedRow) {
+        const klantObj = {
+          name: selectedRow.children[1].textContent,
+          id: selectedRow.children[2].textContent,
+          jobTypes: selectedRow.children[3].textContent
+            .split(",")
+            .map((s) => s.trim()),
+          employees: selectedRow.children[4].textContent
+            .split(",")
+            .map((s) => s.trim()),
+          pdfName: selectedRow.children[5].textContent,
+          isHighPriority: selectedRow.classList.contains("high-priority"),
+        };
+
+        deleteMessage.innerHTML = `Weet je zeker dat je klant "${klantObj.name}" wilt verwijderen?`;
+        deleteModal.style.display = "flex";
+
+        confirmDeleteBtn.onclick = function () {
+          const tbody = selectedRow.parentElement;
+          tbody.removeChild(selectedRow);
+
+          // Verwijder klant uit savedCustomers
+          savedCustomers[selectedDateStr] = savedCustomers[
+            selectedDateStr
+          ].filter(
+            (c) =>
+              !(
+                c.name === klantObj.name &&
+                c.id === klantObj.id &&
+                JSON.stringify(c.jobTypes) ===
+                  JSON.stringify(klantObj.jobTypes) &&
+                JSON.stringify(c.employees) ===
+                  JSON.stringify(klantObj.employees)
+              ),
+          );
+          // Verwijder dag als leeg
+          if (savedCustomers[selectedDateStr].length === 0) {
+            delete savedCustomers[selectedDateStr];
+          }
+          // Sla altijd op!
+          localStorage.setItem(
+            "savedCustomers",
+            JSON.stringify(savedCustomers),
+          );
+
+          // Ook uit checkedCustomers verwijderen
+          if (checkedCustomers[selectedDateStr]) {
+            checkedCustomers[selectedDateStr] = checkedCustomers[
+              selectedDateStr
+            ].filter(
+              (c) =>
+                !(
+                  c.name === klantObj.name &&
+                  c.id === klantObj.id &&
+                  JSON.stringify(c.jobTypes) ===
+                    JSON.stringify(klantObj.jobTypes) &&
+                  JSON.stringify(c.employees) ===
+                    JSON.stringify(klantObj.employees)
+                ),
+            );
+            if (checkedCustomers[selectedDateStr].length === 0) {
+              delete checkedCustomers[selectedDateStr];
+            }
+            localStorage.setItem(
+              "checkedCustomers",
+              JSON.stringify(checkedCustomers),
+            );
+          }
+
+          deleteModal.style.display = "none";
+          actionsModal.style.display = "none";
+
+          showNotification(
+            `Klant verwijderd:<br>${klantInfoString(klantObj, selectedDateStr)}`,
+            "error",
+          );
+
+          // Herlaad pagina als alles afgevinkt is op een dag vóór vandaag
+          if (selectedDateStr < todayStr) {
+            const klanten = savedCustomers[selectedDateStr] || [];
+            const checked = checkedCustomers[selectedDateStr] || [];
+            const allChecked =
+              klanten.length > 0 &&
+              klanten.every((k) =>
+                checked.some(
+                  (c) =>
+                    c.name === k.name &&
+                    c.id === k.id &&
+                    JSON.stringify(c.jobTypes) === JSON.stringify(k.jobTypes) &&
+                    JSON.stringify(c.employees) === JSON.stringify(k.employees),
+                ),
+              );
+            if (allChecked || klanten.length === 0) {
+              location.reload();
+            }
+          }
+        };
+
+        cancelDeleteBtn &&
+          (cancelDeleteBtn.onclick = function () {
+            deleteModal.style.display = "none";
+          });
+      }
+    });
