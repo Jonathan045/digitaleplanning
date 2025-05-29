@@ -44,7 +44,6 @@ window.onload = function () {
   const confirmDeleteBtn = document.getElementById("confirm-delete");
   const cancelDeleteBtn = document.getElementById("cancel-delete");
 
-};
 // Multiselect helpers
   function getSelectedJobTypes() {
     return Array.from(
@@ -110,3 +109,99 @@ window.onload = function () {
           selected.length ? selected.join(", ") : "Selecteer werknemer";
       });
     });
+    const today = new Date();
+  const startDate = new Date(today);
+  startDate.setHours(0, 0, 0, 0);
+  const endDate = new Date(2040, 11, 31);
+
+  let savedCustomers = JSON.parse(localStorage.getItem("savedCustomers")) || {};
+  let checkedCustomers =
+    JSON.parse(localStorage.getItem("checkedCustomers")) || {};
+  let selectedRow = null;
+  let selectedDateStr = null;
+
+  // --- Toegevoegd: Toon notificatie na reload als die in localStorage staat ---
+  const notificationAfterReload = localStorage.getItem(
+    "notificationAfterReload",
+  );
+  if (notificationAfterReload) {
+    const { message, type } = JSON.parse(notificationAfterReload);
+    showNotification(message, type);
+    localStorage.removeItem("notificationAfterReload");
+  }
+
+  // Maand structuur
+  let allMonthBoxes = [];
+  let monthMap = {};
+
+  // Helper voor weeknummer
+  function getWeekNumber(d) {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    return weekNo;
+  }
+
+  // Helper om klantinfo als string te tonen (nu met datum)
+  function klantInfoString(klant, datum) {
+    return `Datum: ${datum}<br>Naam: ${klant.name}, Omschrijving: ${klant.id}, Type werk: ${(klant.jobTypes || [klant.jobType]).join(", ")}, Werknemer: ${(klant.employees || [klant.employee]).join(", ")}, PDF: ${klant.pdfName || "Geen PDF"}, Hoge prioriteit: ${klant.isHighPriority ? "Ja" : "Nee"}`;
+  }
+
+  // Formulier resetten
+  function resetCustomerForm() {
+    document.getElementById("customer-name").value = "";
+    document.getElementById("customer-id").value = "";
+    document.getElementById("customer-enddate").value = "";
+    document.getElementById("customer-pdf").value = "";
+    // Prioriteit resetten naar "nee"
+    document.getElementById("priority-no-radio").checked = true;
+    document.getElementById("priority-yes-radio").checked = false;
+    resetMultiselects();
+  }
+
+  // --- DAG SELECTIE EN FILTERING ---
+  // Maak een lijst van alle datums van vandaag t/m einddatum
+  let dateList = [];
+  let currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    const dateStr = new Date(
+      currentDate.getTime() - currentDate.getTimezoneOffset() * 60000,
+    )
+      .toISOString()
+      .split("T")[0];
+    dateList.push(dateStr);
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  // Vandaag als string
+  const todayStr = new Date(
+    new Date().getTime() - new Date().getTimezoneOffset() * 60000,
+  )
+    .toISOString()
+    .split("T")[0];
+
+  // Bepaal of een dag relevant is (moet getoond worden)
+  function isDayRelevant(dateStr) {
+    if (dateStr === todayStr) return true;
+    if (dateStr > todayStr) return true;
+    // Check of er nog niet-afgevinkte klanten zijn op deze dag
+    const klanten = savedCustomers[dateStr] || [];
+    const checked = checkedCustomers[dateStr] || [];
+    // Toon als er minimaal 1 klant is die NIET is afgevinkt
+    return klanten.some(
+      (k) =>
+        !checked.some(
+          (c) =>
+            c.name === k.name &&
+            c.id === k.id &&
+            (c.jobTypes
+              ? JSON.stringify(c.jobTypes) === JSON.stringify(k.jobTypes)
+              : c.jobType === k.jobType) &&
+            (c.employees
+              ? JSON.stringify(c.employees) === JSON.stringify(k.employees)
+              : c.employee === k.employee),
+        ),
+    );
+  }
+}
