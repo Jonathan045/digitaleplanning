@@ -971,3 +971,69 @@ window.onload = function () {
           });
       }
     });
+    
+  cancelActions &&
+    (cancelActions.onclick = function () {
+      actionsModal.style.display = "none";
+    });
+
+  function toggleDetails(detailId, dateBox, arrow) {
+    const customerDetails = document.getElementById(detailId);
+    if (customerDetails.classList.contains("show")) {
+      customerDetails.classList.remove("show");
+      arrow.style.transform = "rotate(0deg)";
+    } else {
+      customerDetails.classList.add("show");
+      arrow.style.transform = "rotate(90deg)";
+    }
+  }
+
+  function showNotification(message, type) {
+    const notificationContainer = document.getElementById(
+      "notification-container",
+    );
+    notificationContainer.innerHTML = message;
+
+    if (type === "error") {
+      notificationContainer.style.backgroundColor = "#f44336";
+    } else if (type === "success") {
+      notificationContainer.style.backgroundColor = "#4CAF50";
+    }
+
+    notificationContainer.style.display = "block";
+
+    // Voeg klik-event toe om notificatie te sluiten
+    notificationContainer.onclick = function () {
+      notificationContainer.style.display = "none";
+    };
+
+    setTimeout(() => {
+      notificationContainer.style.display = "none";
+    }, 7000);
+  }
+
+  // Laad bestaande klanten uit localStorage (alleen voor relevante dagen)
+  for (const dateStr in savedCustomers) {
+    if (!isDayRelevant(dateStr)) continue;
+    const tbody = document.getElementById(`table-body-${dateStr}`);
+    if (tbody) {
+      // Sorteer: eerst hoge prioriteit, dan de rest
+      const sorted = [...savedCustomers[dateStr]].sort((a, b) => {
+        return (b.isHighPriority === true) - (a.isHighPriority === true);
+      });
+      sorted.forEach((c) => {
+        const row = createCustomerRow(
+          c.name,
+          c.id,
+          c.jobTypes || [c.jobType],
+          c.employees || [c.employee],
+          { files: [], pdfName: c.pdfName },
+          dateStr,
+          tbody,
+          c.isHighPriority,
+          dateStr,
+        );
+        tbody.appendChild(row);
+      });
+    }
+  }
