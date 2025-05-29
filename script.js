@@ -681,3 +681,125 @@ window.onload = function () {
         alert("Vul alle velden in!");
       }
     });
+    
+  // --- GEUPDATE FUNCTIE: klant-rij rood maken bij prioriteit en groen bij checkbox ---
+  function createCustomerRow(
+    name,
+    id,
+    jobTypes,
+    employees,
+    pdfInput,
+    dateStr,
+    tbody,
+    isHighPriority = false,
+    datumVoorMelding = null,
+  ) {
+    const row = document.createElement("tr");
+    if (isHighPriority) row.classList.add("high-priority");
+
+    const checkboxTd = document.createElement("td");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.classList.add("customer-checkbox");
+    checkbox.style.marginLeft = "100px";
+    checkboxTd.appendChild(checkbox);
+    row.appendChild(checkboxTd);
+
+    [name, id, jobTypes.join(", "), employees.join(", ")].forEach((text) => {
+      const td = document.createElement("td");
+      td.textContent = text;
+      td.style.padding = "5px 10px";
+      td.style.textAlign = "left";
+      row.appendChild(td);
+    });
+
+    const pdfTd = document.createElement("td");
+    if (pdfInput.files && pdfInput.files.length > 0) {
+      const file = pdfInput.files[0];
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(file);
+      link.target = "_blank";
+      link.textContent = file.name;
+      pdfTd.appendChild(link);
+    } else if (pdfInput.pdfName) {
+      pdfTd.textContent = pdfInput.pdfName;
+    } else {
+      pdfTd.textContent = "Geen PDF";
+    }
+    row.appendChild(pdfTd);
+
+    const actionsTd = document.createElement("td");
+    actionsTd.style.position = "relative";
+
+    const actionsBtn = document.createElement("button");
+    actionsBtn.textContent = "Acties";
+    actionsBtn.classList.add("action-btn", "actions-btn");
+    actionsTd.appendChild(actionsBtn);
+
+    actionsBtn.onclick = function () {
+      selectedRow = row;
+      selectedDateStr = dateStr;
+      actionsModal.style.display = "flex";
+    };
+
+    row.appendChild(actionsTd);
+
+    // Checkbox afvinken = groen maken + opslaan in localStorage
+    checkbox.addEventListener("change", function () {
+      checkedCustomers[dateStr] = checkedCustomers[dateStr] || [];
+      if (checkbox.checked) {
+        row.classList.add("checked-row");
+        // Voeg toe aan checkedCustomers
+        checkedCustomers[dateStr].push({
+          name,
+          id,
+          jobTypes,
+          employees,
+        });
+      } else {
+        row.classList.remove("checked-row");
+        // Verwijder uit checkedCustomers
+        checkedCustomers[dateStr] = checkedCustomers[dateStr].filter(
+          (c) =>
+            !(
+              c.name === name &&
+              c.id === id &&
+              JSON.stringify(c.jobTypes) === JSON.stringify(jobTypes) &&
+              JSON.stringify(c.employees) === JSON.stringify(employees)
+            ),
+        );
+      }
+      localStorage.setItem(
+        "checkedCustomers",
+        JSON.stringify(checkedCustomers),
+      );
+
+      // Herlaad pagina als alles afgevinkt is op een dag vóór vandaag
+      if (dateStr < todayStr) {
+        const klanten = savedCustomers[dateStr] || [];
+        const checked = checkedCustomers[dateStr] || [];
+        const allChecked =
+          klanten.length > 0 &&
+          klanten.every((k) =>
+            checked.some(
+              (c) =>
+                c.name === k.name &&
+                c.id === k.id &&
+                JSON.stringify(c.jobTypes) === JSON.stringify(k.jobTypes) &&
+                JSON.stringify(c.employees) === JSON.stringify(k.employees),
+            ),
+          );
+        if (allChecked) {
+          location.reload();
+        }
+      }
+      // Verwijder dag als leeg
+      if (checkedCustomers[dateStr] && checkedCustomers[dateStr].length === 0) {
+        delete checkedCustomers[dateStr];
+        localStorage.setItem(
+          "checkedCustomers",
+          JSON.stringify(checkedCustomers),
+        );
+      }
+    });
+  }
