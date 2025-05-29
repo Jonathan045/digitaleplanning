@@ -205,3 +205,102 @@ window.onload = function () {
     );
   }
 }
+
+// Kalender genereren (alleen relevante dagen)
+  let allDateBoxes = [];
+  dateList.forEach((dateStr) => {
+    if (!isDayRelevant(dateStr)) return;
+
+    const dateObj = new Date(dateStr + "T00:00:00");
+    const monthKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}`;
+    if (!monthMap[monthKey]) {
+      const monthBox = document.createElement("div");
+      monthBox.classList.add("month-box");
+      monthBox.textContent = `${dateObj.toLocaleString("nl-NL", { month: "long", year: "numeric" })}`;
+      monthBox.onclick = function () {
+        document
+          .querySelectorAll(`[data-month="${monthKey}"]`)
+          .forEach((day) => {
+            day.style.display = day.style.display === "none" ? "" : "none";
+            const detailId = "details-" + day.getAttribute("data-date");
+            document.getElementById(detailId)?.classList.remove("show");
+            day.querySelector(".arrow").style.transform = "rotate(0deg)";
+          });
+      };
+      dateContainer.appendChild(monthBox);
+      allMonthBoxes.push(monthBox);
+      monthMap[monthKey] = true;
+    }
+
+    const dateBox = document.createElement("div");
+    dateBox.classList.add("date-box");
+
+    const arrow = document.createElement("span");
+    arrow.classList.add("arrow");
+
+    const dateText = document.createElement("span");
+    dateText.textContent = dateObj.toLocaleDateString("nl-NL");
+    dateBox.setAttribute("data-date", dateStr);
+    dateBox.setAttribute("data-month", monthKey);
+
+    dateBox.appendChild(arrow);
+    dateBox.appendChild(dateText);
+
+    // Weeknummer toevoegen
+    const weekNr = getWeekNumber(dateObj);
+    const weekNrSpan = document.createElement("span");
+    weekNrSpan.classList.add("weeknr");
+    weekNrSpan.textContent = `Week ${weekNr}`;
+    dateBox.appendChild(weekNrSpan);
+
+    const detailId = "details-" + dateStr;
+
+    dateBox.onclick = function () {
+      toggleDetails(detailId, dateBox, arrow);
+      dateContainer.scrollTop = dateBox.offsetTop - dateContainer.offsetTop;
+    };
+
+    arrow.onclick = function (event) {
+      event.stopPropagation();
+      toggleDetails(detailId, dateBox, arrow);
+      dateContainer.scrollTop = dateBox.offsetTop - dateContainer.offsetTop;
+    };
+
+    const customerDetails = document.createElement("div");
+    customerDetails.classList.add("customer-details");
+    customerDetails.id = detailId;
+
+    const table = document.createElement("table");
+    table.classList.add("customer-table");
+
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    const headers = [
+      "",
+      "Naam Klant",
+      "Omschrijving",
+      "Type Werk",
+      "Werknemer",
+      "Pakbon",
+      "Acties",
+    ];
+
+    headers.forEach((headerText) => {
+      const th = document.createElement("th");
+      th.textContent = headerText;
+      headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    tbody.id = `table-body-${dateStr}`;
+    table.appendChild(tbody);
+
+    customerDetails.appendChild(table);
+
+    allDateBoxes.push({ dateBox, customerDetails, dateStr });
+    dateContainer.appendChild(dateBox);
+    dateContainer.appendChild(customerDetails);
+  });
